@@ -19,7 +19,7 @@ export default function ProfileCard({
   chatterCount?: number;
   photoCount?: number;
 }) {
-  const avatarUrl = useConfigValue("avatarUrl", siteConfig.avatarUrl);
+  const avatarUrl = useConfigValue("avatarUrl") || siteConfig.avatarUrl;
   const websiteUrl = useConfigValue("websiteUrl", siteConfig.websiteUrl);
   const authorName = useConfigValue("authorName", siteConfig.authorName);
   const bio = useConfigValue("bio", siteConfig.bio);
