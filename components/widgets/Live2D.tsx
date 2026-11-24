@@ -54,6 +54,7 @@ export default function Live2D() {
   });
   const [message, setMessage] = useState("");
   const [activeClip, setActiveClip] = useState<string | null>(null);
+  const [playingClip, setPlayingClip] = useState<string | null>(null);
   const drag = useRef({
     active: false,
     startX: 0,
@@ -70,9 +71,16 @@ export default function Live2D() {
     return () => window.clearTimeout(timeout);
   }, [message]);
 
+  useEffect(() => {
+    if (!activeClip || playingClip === activeClip) return;
+    const timeout = window.setTimeout(() => setActiveClip(null), 8000);
+    return () => window.clearTimeout(timeout);
+  }, [activeClip, playingClip]);
+
   function reactToTap() {
     const index = (lastReaction.current + 1) % reactions.length;
     lastReaction.current = index;
+    setPlayingClip(null);
     setActiveClip(reactions[index].src);
     setMessage(reactions[index].line);
   }
@@ -145,7 +153,7 @@ export default function Live2D() {
   return (
     <div
       aria-label="蓝色大肥鱼桌宠"
-      className="fixed z-40 hidden w-[min(38vw,420px)] cursor-grab touch-none select-none md:block active:cursor-grabbing"
+      className="fixed z-40 hidden aspect-video w-[min(38vw,420px)] cursor-grab touch-none select-none md:block active:cursor-grabbing"
       onClick={handleClick}
       onDoubleClick={() => {
         setOffset({ right: 0, bottom: 0 });
@@ -168,23 +176,37 @@ export default function Live2D() {
       {message && (
         <div
           aria-live="polite"
-          className="pointer-events-none absolute bottom-[82%] right-[12%] max-w-[250px] rounded-xl border border-white/15 bg-slate-900/90 px-4 py-2 text-sm leading-6 text-white shadow-lg backdrop-blur"
+          className="pointer-events-none absolute bottom-[82%] right-[12%] z-10 max-w-[250px] rounded-xl border border-white/15 bg-slate-900/90 px-4 py-2 text-sm leading-6 text-white shadow-lg backdrop-blur"
         >
           {message}
         </div>
       )}
       <video
         autoPlay
-        className="block h-auto w-full"
+        className={`absolute inset-0 h-full w-full ${activeClip && playingClip === activeClip ? "opacity-0" : ""}`}
         draggable={false}
-        key={activeClip ?? "idle"}
-        loop={!activeClip}
+        loop
         muted
-        onEnded={() => setActiveClip(null)}
         playsInline
         preload="metadata"
-        src={activeClip ?? "/mascot/blue-fat-fish-idle.webm"}
+        src="/mascot/blue-fat-fish-idle.webm"
       />
+      {activeClip && (
+        <video
+          key={activeClip}
+          autoPlay
+          className={`absolute inset-0 h-full w-full ${playingClip === activeClip ? "" : "opacity-0"}`}
+          draggable={false}
+          muted
+          onEnded={() => setActiveClip(null)}
+          onError={() => setActiveClip(null)}
+          onPlaying={() => setPlayingClip(activeClip)}
+          onWaiting={() => setPlayingClip(null)}
+          playsInline
+          preload="auto"
+          src={activeClip}
+        />
+      )}
     </div>
   );
 }
