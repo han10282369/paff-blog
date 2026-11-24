@@ -1,0 +1,8 @@
+Blue Fat Fish desktop mascot assets
+
+Character: Mingyue (溟月), artwork by 上善无形.
+Original animation project: https://github.com/PC2005-cloud/dsh-pet
+Animation asset source: https://github.com/MerZlin/dsh-pet-indesktop
+License: CC BY-NC-SA-like terms; personal, non-commercial use only. Please retain attribution and share adaptations under the same terms.
+
+These assets are not covered by the blog source code license.
