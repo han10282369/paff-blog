@@ -25,7 +25,7 @@ import {
   Menu,
   X,
   Settings,
-  Library,
+  Video,
   Bookmark,
 } from "lucide-react";
 
@@ -33,8 +33,8 @@ const navLinks = [
   { href: "/", label: "首页", icon: Home },
   { href: "/posts", label: "文章", icon: BookOpen },
   { href: "/moments", label: "说说", icon: MessageSquare },
-  { href: "/novel", label: "图书馆", icon: Library },
-  { href: "/photowall", label: "照片墙", icon: Camera },
+  { href: "/photowall", label: "相册", icon: Camera },
+  { href: "/videos", label: "视频", icon: Video },
   { href: "/music", label: "音乐", icon: Music },
   { href: "/bookmark", label: "收藏夹", icon: Bookmark },
   { href: "/projects", label: "项目", icon: FolderGit2 },
