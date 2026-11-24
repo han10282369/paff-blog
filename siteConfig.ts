@@ -1,5 +1,6 @@
 // siteConfig.ts - 全站配置中心（前端兜底配置，优先使用数据库中的站点配置）
 
+
 export const siteConfig = {
   // 网站标题与博主信息
   title: "My Blog",
@@ -7,7 +8,7 @@ export const siteConfig = {
   authorName: "PAFF",
   bio: "欢迎来到我的博客",
   // 头像设置
-  avatarUrl: "",
+  avatarUrl: "/images/paff-avatar.webp",
   // 头像点击跳转链接（后台站点配置 websiteUrl，空则不跳转）
   websiteUrl: "",
   // 背景设置
