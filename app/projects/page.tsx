@@ -46,7 +46,7 @@ export default function ProjectsPage() {
   }, [projects, searchQuery]);
 
   function getProjectLink(p: ProjectItem): string | null {
-    return p.link_live || p.link_github || p.link_gitee || null;
+    return p.link_live || p.link_github || p.link_gitee || `/projects/${encodeURIComponent(p.slug)}`;
   }
 
   return (
@@ -136,6 +136,10 @@ export default function ProjectsPage() {
                       <span className="absolute top-3 right-3 md:top-4 md:right-4 text-[10px] md:text-xs font-medium px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-600 dark:text-sky-400 border border-sky-500/20">
                         {statusLabel}
                       </span>
+                    )}
+
+                    {project.cover_image && (
+                      <img src={project.cover_image} alt={`${project.name}界面截图`} className="mb-5 mt-6 aspect-video w-full rounded-lg object-cover" loading="lazy" />
                     )}
 
                     <div className="flex items-start justify-between mb-3 md:mb-4 relative z-10">
