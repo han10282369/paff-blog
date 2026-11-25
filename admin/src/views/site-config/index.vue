@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted } from "vue";
 import { message as msg } from "@/utils/message";
-import { getToken, formatToken } from "@/utils/auth";
+import { prepareInlineImage } from "@/utils/image-upload";
+import type { UploadRequestOptions } from "element-plus";
 import { http } from "@/utils/http";
 import {
   getAllSiteConfig,
@@ -22,29 +23,8 @@ const videoRows = ref<{ title: string; bvid: string; description: string }[]>([]
 
 const MULTI_IMAGE_KEYS = ["bgImages"];
 
-async function prepareImageUpload(file: File): Promise<File | boolean> {
-  if (file.size <= 3 * 1024 * 1024) return file;
-  if (file.type === "image/gif") {
-    msg("动图请控制在 3MB 内", { type: "warning" });
-    return false;
-  }
-  try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, 1280 / Math.max(bitmap.width, bitmap.height));
-    const canvas = document.createElement("canvas");
-    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
-    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
-    const ctx = canvas.getContext("2d");
-    if (!ctx) { bitmap.close(); throw new Error("无法压缩图片"); }
-    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-    bitmap.close();
-    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/webp", 0.8));
-    if (!blob || blob.size > 3 * 1024 * 1024) throw new Error("图片过大，请压缩后重试");
-    return new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" });
-  } catch {
-    msg("图片无法压缩，请选择 3MB 内的有效图片", { type: "error" });
-    return false;
-  }
+function inlineUpload(options: UploadRequestOptions) {
+  return prepareInlineImage(options.file);
 }
 
 function imageUploadError() {
@@ -80,12 +60,6 @@ const rules = {
   value: [{ required: true, message: "请输入配置值", trigger: "blur" }]
 };
 
-const uploadHeaders = computed(() => {
-  const token = getToken();
-  return {
-    Authorization: token ? formatToken(token.accessToken) : ""
-  };
-});
 
 const columns: TableColumnList = [
   { label: "ID", prop: "id", width: 60 },
@@ -445,10 +419,8 @@ onMounted(() => onSearch());
           </el-form-item>
           <el-form-item label="更换图片">
             <el-upload
-              action="/api/upload/image"
-              :before-upload="prepareImageUpload"
+              :http-request="inlineUpload"
               :on-error="imageUploadError"
-              :headers="uploadHeaders"
               :show-file-list="false"
               :on-success="onSingleImageSuccess"
               accept="image/*"
@@ -468,10 +440,8 @@ onMounted(() => onSearch());
           <el-form-item label="图片列表" prop="value">
             <el-upload
               v-model:file-list="imageFileList"
-              action="/api/upload/image"
-              :before-upload="prepareImageUpload"
+              :http-request="inlineUpload"
               :on-error="imageUploadError"
-              :headers="uploadHeaders"
               list-type="picture-card"
               :on-success="onMultiImageSuccess"
               :on-remove="onMultiImageRemove"
