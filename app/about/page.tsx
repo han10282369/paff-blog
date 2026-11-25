@@ -61,10 +61,10 @@ export default async function AboutPage() {
           {/* 标题区 */}
           <div className="mt-4 md:mt-6 mb-5 md:mb-8 border-b border-slate-300/50 dark:border-slate-700 pb-5 md:pb-8">
             <h1 className="text-2xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight mb-2 md:mb-3 transition-colors duration-700">
-              关于本站
+              关于 PAFF
             </h1>
             <p className="text-sm md:text-lg text-indigo-600 dark:text-indigo-400 font-bold tracking-widest uppercase transition-colors duration-700">
-              基于 Starhiro 项目二次开发
+              阅读、记录与个人实践
             </p>
           </div>
 
