@@ -21,23 +21,14 @@ import { CSS } from "@dnd-kit/utilities";
 const CalendarApp = lazy(() => import("./toolbox/CalendarApp"));
 const CalculatorApp = lazy(() => import("./toolbox/CalculatorApp"));
 const ClockApp = lazy(() => import("./toolbox/ClockApp"));
-const DiceApp = lazy(() => import("./toolbox/DiceApp"));
-const HitokotoApp = lazy(() => import("./toolbox/HitokotoApp"));
-const PasswordGeneratorApp = lazy(() => import("./toolbox/PasswordGeneratorApp"));
-const QRCodeApp = lazy(() => import("./toolbox/QRCodeApp"));
 const UnitConverterApp = lazy(() => import("./toolbox/UnitConverterApp"));
 const NoteApp = lazy(() => import("./toolbox/NoteApp"));
 const BaseConverterApp = lazy(() => import("./toolbox/BaseConverterApp"));
-const HistoryApp = lazy(() => import("./toolbox/HistoryApp"));
 const WeatherApp = lazy(() => import("./toolbox/WeatherApp"));
 const BilibiliHotApp = lazy(() => import("./toolbox/BilibiliHotApp"));
 const WorldTimeApp = lazy(() => import("./toolbox/WorldTimeApp"));
-const HotBoardApp = lazy(() => import("./toolbox/HotBoardApp"));
-const ProgrammerHistoryApp = lazy(() => import("./toolbox/ProgrammerHistoryApp"));
 const GitHubRepoApp = lazy(() => import("./toolbox/GitHubRepoApp"));
-const GitHubUserApp = lazy(() => import("./toolbox/GitHubUserApp"));
 const SearchApp = lazy(() => import("./toolbox/SearchApp"));
-const UuidGeneratorApp = lazy(() => import("./toolbox/UuidGeneratorApp"));
 
 interface AppDef {
   id: string;
@@ -59,17 +50,6 @@ const allApps: AppDef[] = [
       </svg>
     ),
     component: SearchApp,
-  },
-  {
-    id: "hotboard",
-    name: "全网热榜",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke="#f59e0b" strokeWidth="1.5" strokeLinejoin="round" />
-        <path d="M8 14h8M9 11h6" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-    component: HotBoardApp,
   },
   {
     id: "bilibilihot",
@@ -96,17 +76,6 @@ const allApps: AppDef[] = [
     component: WeatherApp,
   },
   {
-    id: "githubuser",
-    name: "GitHub用户",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="8" r="4" stroke="#3b82f6" strokeWidth="1.5" />
-        <path d="M4 20c0-3.31 3.58-6 8-6s8 2.69 8 6" stroke="#3b82f6" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-    component: GitHubUserApp,
-  },
-  {
     id: "githubrepo",
     name: "GitHub仓库",
     icon: (
@@ -116,93 +85,12 @@ const allApps: AppDef[] = [
     ),
     component: GitHubRepoApp,
   },
-  {
-    id: "programmer-history",
-    name: "程序员历史",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="4" width="18" height="16" rx="2" stroke="#8b5cf6" strokeWidth="1.5" />
-        <path d="M7 12l2-2-2-2M11 8h4M17 12l-2 2 2 2M13 16h-4" stroke="#8b5cf6" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
-    component: ProgrammerHistoryApp,
-  },
-  {
-    id: "history",
-    name: "历史今天",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <circle cx="12" cy="12" r="9" stroke="#6366f1" strokeWidth="1.5" />
-        <polyline points="12 6 12 12 16 14" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <circle cx="12" cy="12" r="1" fill="#6366f1" />
-      </svg>
-    ),
-    component: HistoryApp,
-  },
 
 
 
   // ── 娱乐互动 ──
-  {
-    id: "hitokoto",
-    name: "一言",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-        <path d="M8 12h.01M12 12h.01M16 12h.01" stroke="#ec4899" strokeWidth="2" strokeLinecap="round" />
-      </svg>
-    ),
-    component: HitokotoApp,
-  },
-  {
-    id: "dice",
-    name: "骰子",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="18" height="18" rx="4" stroke="#f97316" strokeWidth="1.5" />
-        <circle cx="8" cy="8" r="1.5" fill="#f97316" />
-        <circle cx="16" cy="8" r="1.5" fill="#f97316" />
-        <circle cx="12" cy="12" r="1.5" fill="#f97316" />
-        <circle cx="8" cy="16" r="1.5" fill="#f97316" />
-        <circle cx="16" cy="16" r="1.5" fill="#f97316" />
-      </svg>
-    ),
-    component: DiceApp,
-  },
 
   // ── 实用工具 ──
-  {
-    id: "qrcode",
-    name: "二维码",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="7" height="7" rx="1" stroke="#8b5cf6" strokeWidth="1.5" />
-        <rect x="14" y="3" width="7" height="7" rx="1" stroke="#8b5cf6" strokeWidth="1.5" />
-        <rect x="3" y="14" width="7" height="7" rx="1" stroke="#8b5cf6" strokeWidth="1.5" />
-        <rect x="5" y="5" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="16" y="5" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="5" y="16" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="14" y="14" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="18" y="14" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="14" y="18" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-        <rect x="18" y="18" width="3" height="3" rx="0.5" fill="#8b5cf6" />
-      </svg>
-    ),
-    component: QRCodeApp,
-  },
-  {
-    id: "password",
-    name: "密码",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <rect x="5" y="11" width="14" height="10" rx="2" stroke="#10b981" strokeWidth="1.5" />
-        <path d="M8 11V7a4 4 0 118 0v4" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" />
-        <circle cx="12" cy="16" r="1.5" fill="#10b981" />
-        <path d="M12 17.5V19" stroke="#10b981" strokeWidth="1.5" strokeLinecap="round" />
-      </svg>
-    ),
-    component: PasswordGeneratorApp,
-  },
   {
     id: "note",
     name: "记事本",
@@ -292,19 +180,6 @@ const allApps: AppDef[] = [
       </svg>
     ),
     component: ClockApp,
-  },
-  {
-    id: "uuid",
-    name: "UUID",
-    icon: (
-      <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none">
-        <rect x="3" y="3" width="18" height="18" rx="3" stroke="#6366f1" strokeWidth="1.5" />
-        <path d="M8 8h2v2H8zM11 8h2v2h-2zM14 8h2v2h-2z" stroke="#6366f1" strokeWidth="1.5" />
-        <path d="M8 12h8M8 15h6" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" />
-        <path d="M8 8v8M16 8v8" stroke="#6366f1" strokeWidth="1" strokeDasharray="2 2" opacity="0.4" />
-      </svg>
-    ),
-    component: UuidGeneratorApp,
   },
 ];
 
