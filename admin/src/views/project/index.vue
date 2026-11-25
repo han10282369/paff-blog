@@ -8,7 +8,7 @@ import {
   deleteProject
 } from "@/api/project";
 import type { ProjectItem } from "@/api/project";
-import { http } from "@/utils/http";
+import { prepareInlineImage } from "@/utils/image-upload";
 import { useRenderIcon } from "@/components/ReIcon/src/hooks";
 
 defineOptions({ name: "ProjectIndex" });
@@ -179,55 +179,13 @@ async function handleDelete(row: ProjectItem) {
 // ========== 封面上传 ==========
 const uploading = ref(false);
 
-function compressImage(file: File): Promise<File> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const img = new Image();
-      img.onload = () => {
-        const MAX = 1200;
-        let { width, height } = img;
-        if (width > MAX || height > MAX) {
-          const ratio = Math.min(MAX / width, MAX / height);
-          width = Math.round(width * ratio);
-          height = Math.round(height * ratio);
-        }
-        const canvas = document.createElement("canvas");
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return resolve(file);
-        ctx.drawImage(img, 0, 0, width, height);
-        canvas.toBlob(
-          blob => {
-            if (!blob) return resolve(file);
-            resolve(new File([blob], file.name, { type: "image/jpeg" }));
-          },
-          "image/jpeg",
-          0.85
-        );
-      };
-      img.onerror = () => resolve(file);
-      img.src = reader.result as string;
-    };
-    reader.onerror = () => resolve(file);
-    reader.readAsDataURL(file);
-  });
-}
-
 async function handleUpload(options: any) {
   const file = options.file;
   if (!file) return;
   uploading.value = true;
   try {
-    const compressed = await compressImage(file);
-    const formData = new FormData();
-    formData.append("file", compressed);
-    const res = await http.request<{ url: string }>("post", "/api/upload/image", {
-      data: formData,
-      headers: { "Content-Type": "multipart/form-data" }
-    });
-    form.value.cover_image = res.url;
+    const image = await prepareInlineImage(file);
+    form.value.cover_image = image.url;
     message("封面上传成功", { type: "success" });
   } catch (e: any) {
     message(e?.message ?? "上传失败", { type: "error" });
