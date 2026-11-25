@@ -8,7 +8,7 @@ export const siteConfig = {
   authorName: "PAFF",
   bio: "欢迎来到我的博客",
   // 头像设置
-  avatarUrl: "/images/paff-avatar.webp",
+  avatarUrl: "/images/paff-avatar.webp?v=1",
   // 头像点击跳转链接（后台站点配置 websiteUrl，空则不跳转）
   websiteUrl: "",
   // 背景设置
