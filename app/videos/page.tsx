@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ArrowUpRight, Video } from "lucide-react";
+import { getDbSiteConfig } from "@/app/lib/site-config-db";
 
 export const metadata: Metadata = { title: "视频" };
 
@@ -9,9 +10,24 @@ type VideoEntry = {
   description?: string;
 };
 
-const videos: VideoEntry[] = [];
+export const dynamic = "force-dynamic";
 
-export default function VideosPage() {
+export default async function VideosPage() {
+  const config = await getDbSiteConfig();
+  let videos: VideoEntry[] = [];
+  try {
+    const saved: unknown = JSON.parse(config.videoEntries || "[]");
+    if (Array.isArray(saved)) {
+      videos = saved.filter((entry): entry is VideoEntry =>
+        !!entry && typeof entry === "object" &&
+        typeof entry.bvid === "string" && /^BV[a-zA-Z0-9]{10}$/.test(entry.bvid) &&
+        typeof entry.title === "string" && !!entry.title.trim() &&
+        (entry.description === undefined || typeof entry.description === "string")
+      );
+    }
+  } catch {
+    videos = [];
+  }
   return (
     <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6 md:py-12">
       <header className="mb-6 flex items-center gap-3 md:mb-10">
