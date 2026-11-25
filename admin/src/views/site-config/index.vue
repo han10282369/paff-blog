@@ -17,8 +17,39 @@ const loading = ref(false);
 const dataList = ref<SiteConfigItem[]>([]);
 
 // 图片类配置键名
-const SINGLE_IMAGE_KEYS = ["avatarUrl", "defaultPostCover", "photoWallImage"];
+const SINGLE_IMAGE_KEYS = ["avatarUrl", "defaultPostCover", "photoWallImage", "aboutCover"];
+const videoRows = ref<{ title: string; bvid: string; description: string }[]>([]);
+
 const MULTI_IMAGE_KEYS = ["bgImages"];
+
+async function prepareImageUpload(file: File): Promise<File | boolean> {
+  if (file.size <= 3 * 1024 * 1024) return file;
+  if (file.type === "image/gif") {
+    msg("动图请控制在 3MB 内", { type: "warning" });
+    return false;
+  }
+  try {
+    const bitmap = await createImageBitmap(file);
+    const scale = Math.min(1, 1280 / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext("2d");
+    if (!ctx) { bitmap.close(); throw new Error("无法压缩图片"); }
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close();
+    const blob = await new Promise<Blob | null>(resolve => canvas.toBlob(resolve, "image/webp", 0.8));
+    if (!blob || blob.size > 3 * 1024 * 1024) throw new Error("图片过大，请压缩后重试");
+    return new File([blob], file.name.replace(/\.[^.]+$/, ".webp"), { type: "image/webp" });
+  } catch {
+    msg("图片无法压缩，请选择 3MB 内的有效图片", { type: "error" });
+    return false;
+  }
+}
+
+function imageUploadError() {
+  msg("图片上传失败，请检查图片格式与大小后重试", { type: "error" });
+}
 
 function isImageKey(key: string): boolean {
   return SINGLE_IMAGE_KEYS.includes(key) || MULTI_IMAGE_KEYS.includes(key);
@@ -109,6 +140,20 @@ function openAdd() {
 }
 
 function openEdit(row: SiteConfigItem) {
+  videoRows.value = [];
+  if (row.key === "videoEntries") {
+    try {
+      const entries = JSON.parse(row.value || "[]");
+      if (Array.isArray(entries)) videoRows.value = entries.map(entry => ({
+        title: String(entry.title || ""),
+        bvid: String(entry.bvid || ""),
+        description: String(entry.description || "")
+      }));
+    } catch {
+      msg("视频列表格式异常，请先检查原始配置", { type: "error" });
+      return;
+    }
+  }
   isEdit.value = true;
   dialogTitle.value = "编辑配置";
   const val = typeof row.value === "string" ? row.value : JSON.stringify(row.value);
@@ -140,6 +185,22 @@ function openEdit(row: SiteConfigItem) {
 }
 
 async function handleSubmit() {
+  if (form.value.key === "videoEntries") {
+    const entries = videoRows.value.map(row => ({
+      title: row.title.trim(),
+      bvid: row.bvid.trim().match(/BV[a-zA-Z0-9]{10}(?![a-zA-Z0-9])/)?.[0] || "",
+      description: row.description.trim()
+    }));
+    if (entries.some(row => !row.title || !row.bvid)) {
+      msg("每个视频都需要标题和完整 B站视频链接或 BV 号", { type: "warning" });
+      return;
+    }
+    if (new Set(entries.map(row => row.bvid)).size !== entries.length) {
+      msg("同一个视频请只添加一次", { type: "warning" });
+      return;
+    }
+    form.value.value = JSON.stringify(entries);
+  }
   try {
     await formRef.value?.validate();
   } catch {
@@ -356,8 +417,19 @@ onMounted(() => onSearch());
           />
         </el-form-item>
 
+        <!-- 视频列表 -->
+        <template v-if="form.key === 'videoEntries'">
+          <p class="mb-4 text-sm text-gray-500">粘贴已发布的 B站视频链接或 BV 号，按添加顺序展示。</p>
+          <div v-for="(video, index) in videoRows" :key="index" class="mb-5 rounded-lg border p-4">
+            <el-form-item label="视频标题"><el-input v-model="video.title" placeholder="视频标题" /></el-form-item>
+            <el-form-item label="B站视频"><el-input v-model="video.bvid" placeholder="https://www.bilibili.com/video/BV..." /></el-form-item>
+            <el-form-item label="简介"><el-input v-model="video.description" type="textarea" :rows="2" /></el-form-item>
+            <el-button type="danger" plain @click="videoRows.splice(index, 1)">移除此视频</el-button>
+          </div>
+          <el-button @click="videoRows.push({ title: '', bvid: '', description: '' })">添加视频</el-button>
+        </template>
         <!-- 单图配置 -->
-        <template v-if="isSingleImageKey(form.key)">
+        <template v-else-if="isSingleImageKey(form.key)">
           <el-form-item label="当前图片">
             <div class="flex items-center gap-4">
               <el-image
@@ -374,6 +446,8 @@ onMounted(() => onSearch());
           <el-form-item label="更换图片">
             <el-upload
               action="/api/upload/image"
+              :before-upload="prepareImageUpload"
+              :on-error="imageUploadError"
               :headers="uploadHeaders"
               :show-file-list="false"
               :on-success="onSingleImageSuccess"
@@ -395,6 +469,8 @@ onMounted(() => onSearch());
             <el-upload
               v-model:file-list="imageFileList"
               action="/api/upload/image"
+              :before-upload="prepareImageUpload"
+              :on-error="imageUploadError"
               :headers="uploadHeaders"
               list-type="picture-card"
               :on-success="onMultiImageSuccess"
@@ -412,7 +488,7 @@ onMounted(() => onSearch());
             <el-input
               v-model="form.value"
               type="textarea"
-              :rows="3"
+              :rows="form.key === 'aboutContent' ? 12 : 3"
               placeholder="配置值"
             />
           </el-form-item>
