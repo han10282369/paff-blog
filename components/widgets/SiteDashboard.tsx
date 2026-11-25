@@ -9,7 +9,7 @@ export default function SiteDashboard() {
   const [dateStr, setDateStr] = useState("");
   const [uptimeStr, setUptimeStr] = useState("");
   const buildDate = useConfigValue("buildDate", siteConfig.buildDate);
-  const startDate = new Date(buildDate || "2026-06-16T00:00:00").getTime();
+  const startDate = new Date(buildDate || "2026-11-24T22:30:00+08:00").getTime();
 
   useEffect(() => {
     const updateTime = () => {
@@ -29,7 +29,7 @@ export default function SiteDashboard() {
       }));
 
       if (!Number.isFinite(startDate)) {
-        setUptimeStr("建站日期待设置");
+      setUptimeStr("建站日期待设置");
         return;
       }
       const diff = Math.max(0, now.getTime() - startDate);
@@ -65,7 +65,7 @@ export default function SiteDashboard() {
       <div className="flex flex-col items-center gap-2 text-center text-xs leading-5 text-slate-600 dark:text-slate-300">
         <span className="inline-flex items-center gap-2">
           <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-green-500" />
-          系统已稳定运行
+          本站已运行
         </span>
         <span className="font-semibold text-indigo-600 tabular-nums dark:text-indigo-400">
           {uptimeStr || "正在计算…"}
