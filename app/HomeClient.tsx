@@ -9,7 +9,6 @@ const LyricBar = dynamic(() => import("@/components/music/LyricBar"), { ssr: fal
 const LatestPostsCarousel = dynamic(() => import("@/components/home/LatestPostsCarousel"), { ssr: false });
 const LatestChatterCarousel = dynamic(() => import("@/components/home/LatestChatterCarousel"), { ssr: false });
 const PhotoWallPreview = dynamic(() => import("@/components/home/PhotoWallPreview"), { ssr: false });
-const DogDiary = dynamic(() => import("@/components/home/DogDiary"), { ssr: false });
 const SiteDashboard = dynamic(() => import("@/components/widgets/SiteDashboard"), { ssr: false });
 
 export default function HomeClient({
@@ -47,7 +46,7 @@ export default function HomeClient({
           </div>
         </FadeIn>
 
-        {/* 第二行：照片墙 + 文章 + 说说 + 舔狗日记 */}
+        {/* 第二行：照片墙 + 文章 + 说说 + 数字时钟 */}
         <FadeIn delay={0.2}>
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-6 w-full items-stretch">
             <div className="md:col-span-4 h-full">
@@ -60,19 +59,13 @@ export default function HomeClient({
                   <LatestChatterCarousel />
                 </div>
                 <div className="md:col-span-4 h-full flex">
-                  <DogDiary />
+                  <SiteDashboard />
                 </div>
               </div>
             </div>
           </div>
         </FadeIn>
 
-        {/* 底部数据面板 */}
-        <FadeIn delay={0.25}>
-          <div className="w-full">
-            <SiteDashboard />
-          </div>
-        </FadeIn>
       </main>
     </div>
   );
