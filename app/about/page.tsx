@@ -18,9 +18,10 @@ export default async function AboutPage() {
 
   try {
     const fileContents = aboutRaw;
-    const { data, content } = matter(fileContents);
+    const { data, content: defaultContent } = matter(fileContents);
+    const content = dbConfig.aboutContent?.trim() || defaultContent;
 
-    if (data.cover) coverImage = data.cover;
+    coverImage = dbConfig.aboutCover || data.cover || coverImage;
 
     const processedContent = await unified()
       .use(remarkParse)
