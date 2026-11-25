@@ -21,7 +21,7 @@ export const siteConfig = {
   cloudMusicIds: [],
   apiBaseUrl: "",
   social: { github: "", bilibili: "", email: "", x: "", youtube: "" },
-  buildDate: "2026-06-26T00:00:00",
+  buildDate: "2026-11-24T22:30:00+08:00",
   icpConfig: { name: "", link: "" },
   moeIcpConfig: { name: "", link: "" },
   chatterTitle: "留言",
