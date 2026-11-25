@@ -10,7 +10,7 @@ import type { ChatterItem } from "@/app/api";
 
 function ChatterImage({ src }: { src: string }) {
   const [isLandscape, setIsLandscape] = useState(true);
-  if (!src || (!src.startsWith("http") && !src.startsWith("/"))) return null;
+  if (!src || (!src.startsWith("http") && !src.startsWith("/") && !src.startsWith("data:image/webp;base64,"))) return null;
   return (
     <div
       className={`rounded-lg overflow-hidden relative shrink-0 ${
