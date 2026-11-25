@@ -1,3 +1,4 @@
+import { prepareInlineImage } from "@/utils/image-upload";
 import { http } from "@/utils/http";
 
 export type AlbumItem = {
@@ -73,16 +74,5 @@ export const deletePhoto = (photoId: number) => {
   );
 };
 
-/** 上传图片到 OSS */
-export const uploadImage = (file: File) => {
-  const formData = new FormData();
-  formData.append("file", file);
-  return http.request<{ url: string; orientation: string }>(
-    "post",
-    "/api/upload/image",
-    {
-      data: formData,
-      timeout: 60000
-    }
-  );
-};
+/** Images are compressed locally and persisted with their content record. */
+export const uploadImage = prepareInlineImage;
