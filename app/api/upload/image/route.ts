@@ -2,14 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/app/lib/prisma";
 import { getCurrentUser } from "@/app/lib/auth";
 import { uploadFile, deleteFile, cleanUrlPath, generateFileName } from "@/app/lib/r2";
-
-function ensureR2PublicUrl(): void {
-  if (!process.env.R2_PUBLIC_URL) {
-    throw new Error(
-      "R2_PUBLIC_URL 未配置。请为 Cloudflare R2 存储桶设置自定义域（Public URL），否则上传的图片无法在前台公开访问。"
-    );
-  }
-}
+import sharp from "sharp";
 
 const ALLOWED_TYPES = [
   "image/jpeg",
@@ -53,11 +46,30 @@ export async function POST(request: Request) {
 
     const buffer = await file.arrayBuffer();
 
-    // 上传前必须配置 R2 公开访问域名，否则图片无法在前台显示
-    ensureR2PublicUrl();
+    // Small personal libraries can store compressed images with their existing
+    // avatar, cover or photo record when object storage is not configured.
+    if (!process.env.R2_PUBLIC_URL) {
+      try {
+        const image = sharp(Buffer.from(buffer), { animated: true, limitInputPixels: 40_000_000 }).rotate();
+        const metadata = await image.metadata();
+        const encoded = await image
+          .resize({ width: 1280, height: 1280, fit: "inside", withoutEnlargement: true })
+          .webp({ quality: 76 })
+          .toBuffer();
+        if (encoded.length > 512 * 1024) {
+          return NextResponse.json({ error: "图片压缩后仍过大，请缩小图片后重试" }, { status: 413 });
+        }
+        return NextResponse.json({
+          url: `data:image/webp;base64,${encoded.toString("base64")}`,
+          orientation: (metadata.autoOrient?.width ?? metadata.width ?? 0) >= (metadata.autoOrient?.height ?? metadata.height ?? 0) ? "landscape" : "portrait",
+        });
+      } catch {
+        return NextResponse.json({ error: "无法读取图片，请上传有效的 JPG、PNG、WebP 或 GIF" }, { status: 400 });
+      }
+    }
 
     // 简易方向检测（Cloudflare 不支持 sharp 原生模块）
-    let orientation = "landscape";
+    const orientation = "landscape";
     // 后续可通过 Cloudflare Images 的 metadata 获取，这里默认 landscape
 
     const imageUrl = await uploadFile(key, buffer, file.type);
@@ -66,9 +78,10 @@ export async function POST(request: Request) {
       url: imageUrl,
       orientation,
     });
-  } catch (err: any) {
-    if (err.message === "未登录" || err.message === "无效的令牌") {
-      return NextResponse.json({ error: err.message }, { status: 401 });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "上传失败";
+    if (message === "未登录" || message === "无效的令牌") {
+      return NextResponse.json({ error: message }, { status: 401 });
     }
     console.error("Upload image error:", err);
     return NextResponse.json({ error: "上传失败" }, { status: 500 });
@@ -94,6 +107,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "缺少 url 参数" }, { status: 400 });
     }
 
+    if (url.startsWith("data:image/webp;base64,")) {
+      return NextResponse.json({ code: 0, message: "删除成功" });
+    }
+
     const key = cleanUrlPath(url);
     if (key.includes("..") || key.includes("\\")) {
       return NextResponse.json({ error: "非法文件名" }, { status: 400 });
@@ -101,8 +118,9 @@ export async function DELETE(request: NextRequest) {
 
     await deleteFile(key);
     return NextResponse.json({ code: 0, message: "删除成功" });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "删除失败";
     console.error("Delete image error:", err);
-    return NextResponse.json({ error: err.message || "删除失败" }, { status: 500 });
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
