@@ -10,6 +10,8 @@ import { siteConfig } from "@/siteConfig";
 import { getDbSiteConfig } from "@/app/lib/site-config-db";
 import FadeIn from "@/components/ui/FadeIn";
 
+export const dynamic = "force-dynamic";
+
 export default async function AboutPage() {
   const dbConfig = await getDbSiteConfig().catch(() => ({} as Record<string, string>));
   const avatarUrl = dbConfig.avatarUrl || siteConfig.avatarUrl;
